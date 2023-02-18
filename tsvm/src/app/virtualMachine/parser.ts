@@ -7,10 +7,11 @@ export enum PositionRule {
   REGISTER_OR_CONSTANT,
   CONSTANT
 }
+
 export interface InstructionRule {
   lineLength: number
-  position1?:  PositionRule
-  position2?:  PositionRule
+  position1?: PositionRule
+  position2?: PositionRule
 }
 
 const instructionRules: Map<string, InstructionRule> = new Map<string, InstructionRule>([
@@ -119,6 +120,8 @@ export default class Parser {
       }
     }
 
+    console.log("Parser pass1 complete...")
+
     return {
       exitCode: 0,
       status: "Parsing complete",
@@ -139,7 +142,7 @@ export default class Parser {
   private syntaxAnalysis(tokenStream: Array<Token>, idx: number): ParseResult {
 
     idx++; // Skip pass .code
-    let line : number = 1;
+    let line: number = 1;
 
     do {
       let token: Token = tokenStream[idx];
@@ -153,7 +156,7 @@ export default class Parser {
         }
         return {
           exitCode: 1,
-          status: `Invalid instruction '${token.value}' found on line ${line}.`
+          status: `Expected instruction but found '${token.value}' found on line ${line}.`
         }
       }
 
@@ -173,19 +176,19 @@ export default class Parser {
           idx++;
           break;
         case 2:
-           parseResult = this.evaluateLine(tokenStream[idx].value, tokenStream[idx+1].value);
+          parseResult = this.evaluateLine(tokenStream[idx].value, tokenStream[idx + 1].value);
 
-          if (parseResult.exitCode !=0) {
+          if (parseResult.exitCode != 0) {
             parseResult.status += ` on line ${line}`;
             return parseResult;
           }
 
-          idx+=2;
+          idx += 2;
           break;
         case 3:
-           parseResult = this.evaluateLine(tokenStream[idx].value, tokenStream[idx+1].value, tokenStream[idx+2].value);
+          parseResult = this.evaluateLine(tokenStream[idx].value, tokenStream[idx + 1].value, tokenStream[idx + 2].value);
 
-          if (parseResult.exitCode !=0) {
+          if (parseResult.exitCode != 0) {
             parseResult.status += ` on line ${line}`;
 
             return parseResult;
@@ -205,10 +208,10 @@ export default class Parser {
     };
   }
 
-  private evaluateLine(op1: string, op2 : string, op3 : string = "") : ParseResult {
+  private evaluateLine(op1: string, op2: string, op3: string = ""): ParseResult {
 
     // @ts-ignore
-    let instructionRule : InstructionRule = instructionRules.get(op1);
+    let instructionRule: InstructionRule = instructionRules.get(op1);
 
     //@ts-ignore
     if (instructionRule.position1 == PositionRule.REGISTER) {
@@ -217,7 +220,7 @@ export default class Parser {
       if (!keywords.has(op2) || keywords.get(op2).operand != Operand.REGISTER) {
         return {
           exitCode: 1,
-          status: `Expected register in position 1 but found '${op2}'`
+          status: `Expected register in position 2 but found '${op2}'`
         }
       }
     } else if (instructionRule.position1 == PositionRule.CONSTANT) {
@@ -226,7 +229,7 @@ export default class Parser {
       if (keywords.has(op2)) {
         return {
           exitCode: 1,
-          status: `Expected constant in position 1 but found '${op2}'`
+          status: `Expected constant in position 2 but found '${op2}'`
         }
       }
 
@@ -234,7 +237,35 @@ export default class Parser {
       if (!this._symbolTable.has(op2) && Number.isInteger(op2)) {
         return {
           exitCode: 1,
-          status: `Unrecognized symbol in position 1 '${op2}'`
+          status: `Unrecognized symbol in position 2 '${op2}'`
+        }
+      }
+    }
+
+    if (op3 != "") {
+
+      if (!this._symbolTable.has(op3)) {
+
+        // @ts-ignore
+        if (keywords.has(op3) && keywords.get(op3).operand != Operand.REGISTER) {
+          return {
+            exitCode: 1,
+            status: `Unexpected instruction in position 3 '${op3}'`
+          }
+        } else { // @ts-ignore
+          if (keywords.has(op3) && keywords.get(op3).operand == Operand.REGISTER) {
+            return {
+              exitCode: 0,
+              status: "ok"
+            }
+          }
+        }
+
+        if (isNaN(Number(op3))) {
+          return {
+            exitCode: 1,
+            status: `Unrecognized symbol in position 3 '${op3}'`
+          }
         }
       }
     }
@@ -267,6 +298,11 @@ export default class Parser {
         return {
           exitCode: 1,
           status: `You can't use registered operand '${variableName}' as a variable name`
+        }
+      } else if (!isNaN(Number(variableName))) {
+        return {
+          exitCode: 1,
+          status: `You can't use the number '${variableName}' as a variable name`
         }
       } else {
         this._symbolTable.set(variableName, variableValue);
