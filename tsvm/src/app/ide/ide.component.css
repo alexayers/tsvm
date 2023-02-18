@@ -10,7 +10,15 @@
   border: 1px solid #9d9d9d;
 }
 
-textarea {
+#codeSegment {
+  color: cadetblue;
+}
+
+#dataSegment {
+  color: orange;
+}
+
+#ide {
 
   line-height: 21px;
   overflow-y: hidden;
@@ -24,6 +32,9 @@ textarea {
   height: 350px;
 }
 
+.statement {
+  color: orange;
+}
 
 /* CSS */
 .button-2 {

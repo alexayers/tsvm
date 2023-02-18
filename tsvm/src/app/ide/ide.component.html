@@ -1,7 +1,35 @@
 <div class="editor">
-  <textarea id="ide" #code></textarea>
+  <div id="ide" #code contenteditable="true" (keyup)="processCode(code.innerText)">
 
-    <button id="run" class="button-2" (click) = 'execute(code.value)'>Run</button>
+    <div id="dataSegment">
+      <p>
+        .data
+      </p>
+      <p>
+        myVariable "hello world!"
+      </p>
+      <p>
+        myCounter 5
+      </p>
+    </div>
+    <div id="codeSegment">
+      <p>
+        .code
+      </p>
+      <p>
+        mov ax myVariable
+      </p>
+      <p>
+        mov ix 1
+      </p>
+      <p>
+        int 2
+      </p>
+    </div>
+
+  </div>
+
+  <button id="run" class="button-2" (click)='execute(code.innerText)'>Run</button>
 
 </div>
 

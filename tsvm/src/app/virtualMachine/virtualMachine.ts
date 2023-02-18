@@ -1,23 +1,25 @@
-import Lexer, {Token} from "./lexer";
+
+import {Compiler} from "./compiler";
+import {ParseResult} from "./parser";
 
 
 export default class VirtualMachine {
 
+    private _compiler: Compiler;
+    private _response: string = "";
 
-  private _lexer: Lexer;
+    constructor() {
+      this._compiler = new Compiler();
+    }
 
-  constructor() {
-    this._lexer = new Lexer();
-  }
 
   compile(code : string) : void {
-    let tokenStream : Array<Token> = this._lexer.tokenize(code);
-
-    console.log(tokenStream);
+      let result : ParseResult = this._compiler.compile(code);
+      this._response = result.status;
   }
 
   execute() : string {
-    return "ok";
+    return this._response;
   }
 
 }

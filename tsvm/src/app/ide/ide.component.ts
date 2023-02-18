@@ -12,15 +12,17 @@ export class IdeComponent implements OnInit, OnDestroy {
   message: string | undefined;
   subscription: Subscription | undefined;
 
-  constructor(private data: DataBusService) { }
+
+  constructor(private data: DataBusService) {
+
+
+  }
 
   ngOnInit(): void {
     this.subscription = this.data.currentMessage.subscribe(message => this.message= message)
   }
 
   execute(value: string) {
-    console.log(value);
-
 
     if (typeof Worker !== 'undefined') {
       // Create a new
@@ -44,4 +46,22 @@ export class IdeComponent implements OnInit, OnDestroy {
     // @ts-ignore
     this.subscription.unsubscribe();
   }
+
+  processCode(innerText: string) {
+
+    let keywords = ["mov"];
+    let newHTML = "";
+    // Loop through words
+    innerText.replace(/[\s]+/g, " ").trim().split(" ").forEach(function(val) {
+      // If word is statement
+      if (keywords.indexOf(val.trim()) > -1) {
+        newHTML += "<span class='statement'>" + val + "&nbsp;</span>";
+      } else {
+        newHTML += "<span class='other'>" + val + "&nbsp;</span>";
+      }
+    });
+
+
+  }
+
 }
