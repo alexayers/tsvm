@@ -1,13 +1,13 @@
 
 
-.flex-container {
-  display: flex;
+
+.container {
+  margin: auto;
+  width: 50%;
+
+  padding: 10px;
 }
 
-.flex-child {
-  flex: 1;
-}
+.child {
 
-.flex-child:first-child {
-  margin-right: 5px;
 }

@@ -7,17 +7,44 @@
   background: #282a3a;
   border-radius: 2px;
   padding: 20px 10px;
+  border: 1px solid #9d9d9d;
 }
 
 textarea {
+
   line-height: 21px;
   overflow-y: hidden;
   padding: 0;
-  border: 0;
+
   background: #282a3a;
-  color: #FFF;
+  color: #a6bdd1;
   min-width: 500px;
   outline: none;
   resize: none;
   height: 350px;
+}
+
+
+/* CSS */
+.button-2 {
+  background-color: rgba(255, 255, 255, 0.45);
+  border-radius: 2px;
+  border-width: 0;
+  color: #1a1a1a;
+  cursor: pointer;
+  display: inline-block;
+  font-family: "Haas Grot Text R Web", "Helvetica Neue", Helvetica, Arial, sans-serif;
+  font-size: 14px;
+  font-weight: 500;
+  line-height: 20px;
+  list-style: none;
+  margin: 0;
+  padding: 10px 12px;
+  text-align: center;
+  transition: all 200ms;
+  vertical-align: baseline;
+  white-space: nowrap;
+  user-select: none;
+  -webkit-user-select: none;
+  touch-action: manipulation;
 }
