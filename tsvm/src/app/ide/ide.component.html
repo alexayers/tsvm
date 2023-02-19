@@ -2,29 +2,17 @@
   <div id="ide" #code contenteditable="true" (keyup)="processCode(code.innerText)">
 
     <div id="dataSegment">
-      <p>
-        .data
-      </p>
-      <p>
-        myVariable "hello world!"
-      </p>
-      <p>
-        myCounter 5
-      </p>
+      .data
+
     </div>
     <div id="codeSegment">
-      <p>
-        .code
-      </p>
-      <p>
-        mov ax myVariable
-      </p>
-      <p>
-        mov ix 1
-      </p>
-      <p>
-        int 2
-      </p>
+
+        .code<br>
+        mov ax 1<br>
+        mov bx 2<br>
+        mov ix 0<br>
+        int 1<br>
+
     </div>
 
   </div>

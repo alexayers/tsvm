@@ -62,3 +62,54 @@ export const keywords : Map<string,Token> =new Map([
   [".data",{operand: Operand.SEGMENT,value: ".data"}],
 
 ]);
+
+
+export enum PositionRule {
+
+  REGISTER,
+  REGISTER_OR_CONSTANT,
+  CONSTANT
+}
+
+export interface InstructionRule {
+  lineLength: number
+  position1?: PositionRule
+  position2?: PositionRule
+}
+
+export const instructionRules: Map<string, InstructionRule> = new Map<string, InstructionRule>([
+  ["mov", {lineLength: 3, position1: PositionRule.REGISTER, position2: PositionRule.REGISTER_OR_CONSTANT}],
+  ["lea", {lineLength: 3, position1: PositionRule.REGISTER}],
+
+  ["add", {lineLength: 3, position1: PositionRule.REGISTER, position2: PositionRule.REGISTER_OR_CONSTANT}],
+  ["sub", {lineLength: 3, position1: PositionRule.REGISTER, position2: PositionRule.REGISTER_OR_CONSTANT}],
+  ["mul", {lineLength: 3, position1: PositionRule.REGISTER, position2: PositionRule.REGISTER_OR_CONSTANT}],
+  ["div", {lineLength: 3, position1: PositionRule.REGISTER, position2: PositionRule.REGISTER_OR_CONSTANT}],
+  ["inc", {lineLength: 3, position1: PositionRule.REGISTER}],
+  ["dec", {lineLength: 3, position1: PositionRule.REGISTER}],
+
+  ["and", {lineLength: 3, position1: PositionRule.REGISTER, position2: PositionRule.REGISTER_OR_CONSTANT}],
+  ["or", {lineLength: 3, position1: PositionRule.REGISTER, position2: PositionRule.REGISTER_OR_CONSTANT}],
+  ["not", {lineLength: 3, position1: PositionRule.REGISTER, position2: PositionRule.REGISTER_OR_CONSTANT}],
+  ["xor", {lineLength: 3, position1: PositionRule.REGISTER, position2: PositionRule.REGISTER_OR_CONSTANT}],
+  ["neg", {lineLength: 2, position1: PositionRule.REGISTER, position2: PositionRule.REGISTER_OR_CONSTANT}],
+
+  ["cmp", {lineLength: 3, position1: PositionRule.REGISTER}],
+  ["jmp", {lineLength: 2, position1: PositionRule.CONSTANT}],
+  ["je", {lineLength: 2, position1: PositionRule.CONSTANT}],
+  ["jne", {lineLength: 2, position1: PositionRule.CONSTANT}],
+  ["jl", {lineLength: 2, position1: PositionRule.CONSTANT}],
+  ["jg", {lineLength: 2, position1: PositionRule.CONSTANT}],
+  ["jge", {lineLength: 2, position1: PositionRule.CONSTANT}],
+  ["jle", {lineLength: 2, position1: PositionRule.CONSTANT}],
+
+  ["push", {lineLength: 2, position1: PositionRule.REGISTER_OR_CONSTANT}],
+  ["pop", {lineLength: 2, position1: PositionRule.REGISTER}],
+  ["pusha", {lineLength: 1}],
+  ["popa", {lineLength: 1}],
+
+  ["call", {lineLength: 2, position1: PositionRule.CONSTANT}],
+  ["ret", {lineLength: 1}],
+  ["int", {lineLength: 2, position1: PositionRule.CONSTANT}],
+  [".data", {lineLength: 1}],
+]);
