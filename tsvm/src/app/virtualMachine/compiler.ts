@@ -1,11 +1,15 @@
 import Parser, {ParseResult} from "./parser";
 import Lexer from "./lexer";
-import {Token} from "./keywords";
+import {Token} from "./constants";
 
 export interface CompilerResult {
   status: string
   exitCode: number
+  byteCodes?: Array<number>
+
+  parseResults: ParseResult
 }
+
 
 
 export class Compiler {
@@ -24,11 +28,15 @@ export class Compiler {
     let parseResult : ParseResult = this._parser.parse(tokenStream);
     console.log(parseResult);
 
+
     return {
       exitCode: parseResult.exitCode,
-      status: parseResult.status
+      status: parseResult.status,
+      parseResults: parseResult
     };
   }
+
+
 
 
 }

@@ -1,4 +1,4 @@
-import {instructionRules, keywords, Operand, PositionRule, Token} from "./keywords";
+import {ByteCode, InstructionRule, instructionRules, keywords, Operand, PositionRule, Token} from "./constants";
 
 
 export interface ParseResult {
@@ -7,6 +7,11 @@ export interface ParseResult {
 
   symbolTable?: Map<string, any>
   jumpTable?: Map<string, number>
+
+  ds?: number
+  cs?: number
+
+  byteCodes?: Array<ByteCode>
 }
 
 export default class Parser {
@@ -17,9 +22,12 @@ export default class Parser {
   private readonly _symbolTable: Map<string, any>
   private readonly _jumpTable: Map<string, number>
 
+  private _byteCodes: Array<ByteCode>
+
   constructor() {
     this._symbolTable = new Map<string, any>();
     this._jumpTable = new Map<string, number>();
+    this._byteCodes = [];
 
     this._codeSegment = 0;
     this._dataSegment = 0;
@@ -27,6 +35,7 @@ export default class Parser {
 
   parse(tokenStream: Array<Token>): ParseResult {
     let parseResult: ParseResult = this.pass1(tokenStream);
+    parseResult.byteCodes = this.pass2(tokenStream, parseResult);
 
     return parseResult;
   }
@@ -36,18 +45,26 @@ export default class Parser {
     let foundCodeSegment: boolean = false;
     let foundDataSegment: boolean = false;
     let parseResult: ParseResult;
+    let cs: number = 0;
+    let ds: number = 0;
 
     for (let i = 0; i < tokenStream.length; i++) {
       let token: Token = tokenStream[i];
 
       if (token.value == ".code") {
+
+        cs = i + 1;
         parseResult = this.syntaxAnalysis(tokenStream, i);
+
         if (parseResult.exitCode != 0) {
           return parseResult;
         }
 
+        console.log("Syntax Analysis complete...");
         foundCodeSegment = true;
       } else if (token.value == ".data") {
+
+        ds = i + 1;
         parseResult = this.buildSymbolTable(tokenStream, i);
 
         if (parseResult.exitCode != 0) {
@@ -80,18 +97,130 @@ export default class Parser {
       exitCode: 0,
       status: "Parsing complete",
       symbolTable: this._symbolTable,
-      jumpTable: this._jumpTable
+      jumpTable: this._jumpTable,
+      byteCodes: this._byteCodes,
+      cs: cs,
+      ds: ds
     }
   }
 
-  pass2(tokenStream: Array<Token>) {
+  pass2(tokenStream: Array<Token>, parseResult: ParseResult): Array<ByteCode> {
+    let byteCodes: Array<ByteCode> = [];
 
+    // @ts-ignore
+    let startingIdx: number = parseResult.cs;
+    let endingIdx: number = 0;
+
+    // @ts-ignore
+    if (parseResult.ds > parseResult.cs) {
+      // @ts-ignore
+      endingIdx = parseResult.ds;
+    } else {
+      endingIdx = tokenStream.length
+    }
+
+    for (let i = startingIdx; i < endingIdx; i++) {
+      let token: Token = tokenStream[i];
+
+      let op1: string = token.value;
+
+      let byteCode: ByteCode = {
+        instructionSize: 0,
+        op1: 0,
+        op2: 0,
+        op2Operand: undefined,
+        op3: 0,
+        op3Operand: undefined
+      };
+
+      // @ts-ignore
+      let instructionRule: InstructionRule = instructionRules.get(op1);
+
+      console.log(instructionRule);
+      let instructionSize = instructionRule.lineLength;
+      byteCode.instructionSize = instructionSize;
+
+      // @ts-ignore
+      byteCode.op1 = keywords.get(op1).opCode;
+
+      let token2;
+      let token3;
+
+      switch (instructionSize) {
+        case 2:
+
+          token2 = tokenStream[i + 1];
+
+          byteCode = this.assignByteCode(token2.value, 2, byteCode);
+
+
+          i++;
+          break;
+        case 3:
+          token2 = tokenStream[i + 1];
+          token3 = tokenStream[i + 2];
+
+          byteCode = this.assignByteCode(token2.value, 2, byteCode);
+          byteCode = this.assignByteCode(token3.value, 3, byteCode);
+
+          i += 2;
+          break;
+      }
+
+
+      byteCodes.push(byteCode);
+    }
+
+    console.log("ByteCode generation complete...");
+    return byteCodes;
   }
 
-  isValidStream(tokenStream: Array<Token>): boolean {
+  private assignByteCode(token: string, position: number, byteCode: ByteCode): ByteCode {
+    // @ts-ignore
+    if (keywords.has(token) && keywords.get(token).operand == Operand.REGISTER) {
+
+      if (position == 2) {
+        // @ts-ignore
+        byteCode.op2 = keywords.get(token).opCode;
+        byteCode.op2Operand = Operand.REGISTER;
+      } else {
+// @ts-ignore
+        byteCode.op3= keywords.get(token).opCode;
+        byteCode.op3Operand = Operand.REGISTER;
+      }
+
+      // @ts-ignore
+    } else if (this._symbolTable.has(token)) {
+
+      if (position == 2) {
+        // @ts-ignore
+        byteCode.op2 = keywords.get(token).opCode;
+        byteCode.op2Operand = Operand.CONSTANT;
+      } else {
+        // @ts-ignore
+        byteCode.op3 = keywords.get(token).opCode;
+        byteCode.op3Operand = Operand.CONSTANT;
+      }
+    } else if (!isNaN(Number(token))) {
 
 
-    return true;
+      if (position == 2) {
+        // @ts-ignore
+        byteCode.op2 = Number(token);
+        byteCode.op2Operand = Operand.NUMBER;
+      } else {
+        // @ts-ignore
+        byteCode.op3 = Number(token);
+        byteCode.op3Operand = Operand.NUMBER;
+      }
+
+    } else {
+      console.error(`Compilation error: unable to determine opCode for '${token}'`);
+    }
+
+
+    return byteCode;
+
   }
 
   private syntaxAnalysis(tokenStream: Array<Token>, idx: number): ParseResult {
@@ -119,8 +248,6 @@ export default class Parser {
             status: `Expected instruction but found '${token.value}' found on line ${line}.`
           }
         }
-
-
       }
 
       if (!instructionRules.has(token.value)) {
@@ -169,7 +296,6 @@ export default class Parser {
       line++;
     } while (idx < tokenStream.length);
 
-
     return {
       exitCode: 0,
       status: "ok"
@@ -180,6 +306,7 @@ export default class Parser {
 
     // @ts-ignore
     let instructionRule: InstructionRule = instructionRules.get(op1);
+
 
     //@ts-ignore
     if (instructionRule.position1 == PositionRule.REGISTER) {
@@ -237,7 +364,6 @@ export default class Parser {
         }
       }
     }
-
 
     return {
       exitCode: 0,

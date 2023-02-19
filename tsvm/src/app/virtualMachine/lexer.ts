@@ -1,9 +1,4 @@
-import {keywords, Operand, Token} from "./keywords";
-
-
-
-
-
+import {keywords, Operand, Token} from "./constants";
 
 
 
@@ -68,7 +63,8 @@ export default class Lexer {
       } else {
         token = {
           operand: Operand.CONSTANT,
-          value: tokenString
+          value: tokenString,
+          opCode: -1
         }
 
         this._tokenStream.push(token);
