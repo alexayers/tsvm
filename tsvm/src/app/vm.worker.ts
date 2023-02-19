@@ -2,13 +2,13 @@
 
 import VirtualMachine from "./virtualMachine/virtualMachine";
 
-const virtualMachine : VirtualMachine = new VirtualMachine();
+const virtualMachine: VirtualMachine = new VirtualMachine();
 
-addEventListener('message', ({ data }) => {
+addEventListener('message', ({data}) => {
 
 
   virtualMachine.compile(data);
 
   const response = virtualMachine.execute();
-    postMessage(response);
+  postMessage(response);
 });

@@ -25,6 +25,38 @@ function assignOpCode() : number {
   return opCodeIdx;
 }
 
+export enum Instruction {
+  MOV,
+  LEA,
+  ADD,
+  SUB,
+  MUL,
+  DIV,
+  INC,
+  DEC,
+  AND,
+  OR,
+  NOT,
+  XOR,
+  NEG,
+  CMP,
+  JMP,
+  JE,
+  JNE,
+  JL,
+  JG,
+  JGE,
+  JLE,
+  PUSH,
+  POP,
+  PUSHA,
+  POPA,
+  CALL,
+  RET,
+  INT
+
+}
+
 export const keywords : Map<string,Token> =new Map([
   ["mov", {operand: Operand.INSTRUCTION, value: "mov", opCode:assignOpCode()}],
   ["lea",{operand: Operand.INSTRUCTION,value: "lea", opCode:assignOpCode()}],
@@ -63,18 +95,15 @@ export const keywords : Map<string,Token> =new Map([
 
   [".code",{operand: Operand.SEGMENT,value: ".code", opCode:assignOpCode()}],
   [".data",{operand: Operand.SEGMENT,value: ".data", opCode:assignOpCode()}],
-
-  ["ax",{operand: Operand.REGISTER,value: "ax", opCode:assignOpCode()}],
-  ["bx",{operand: Operand.REGISTER,value: "bx", opCode:assignOpCode()}],
-  ["cx",{operand: Operand.REGISTER,value: "cx", opCode:assignOpCode()}],
-  ["dx",{operand: Operand.REGISTER,value: "dx", opCode:assignOpCode()}],
   ["ix",{operand: Operand.REGISTER,value: "ix", opCode:assignOpCode()}],
   ["sp",{operand: Operand.REGISTER,value: "sp", opCode:assignOpCode()}],
-  ["ip",{operand: Operand.REGISTER,value: "ip", opCode:assignOpCode()}]
-
-
-
+  ["ip",{operand: Operand.REGISTER,value: "ip", opCode:assignOpCode()}],
 ]);
+
+
+for (let i =0; i < 10; i++) {
+  keywords.set(`r${i}`, {operand: Operand.REGISTER,value: `r${i}`, opCode:assignOpCode()})
+}
 
 
 export enum PositionRule {
@@ -130,8 +159,8 @@ export const instructionRules: Map<string, InstructionRule> = new Map<string, In
 export interface ByteCode {
 
   op1: number,
-  op2: number,
-  op3: number
+  op2: any,
+  op3: any
   instructionSize: number
   op2Operand: Operand | undefined
   op3Operand: Operand  | undefined

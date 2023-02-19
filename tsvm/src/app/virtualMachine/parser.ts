@@ -1,17 +1,20 @@
 import {ByteCode, InstructionRule, instructionRules, keywords, Operand, PositionRule, Token} from "./constants";
 
 
+export interface Program {
+  symbolTable?: Map<string, any>
+  jumpTable?: Map<string, number>
+  byteCodes?: Array<ByteCode>
+}
+
 export interface ParseResult {
   status: string
   exitCode: number
 
-  symbolTable?: Map<string, any>
-  jumpTable?: Map<string, number>
-
   ds?: number
   cs?: number
 
-  byteCodes?: Array<ByteCode>
+  program?: Program | undefined
 }
 
 export default class Parser {
@@ -35,7 +38,13 @@ export default class Parser {
 
   parse(tokenStream: Array<Token>): ParseResult {
     let parseResult: ParseResult = this.pass1(tokenStream);
-    parseResult.byteCodes = this.pass2(tokenStream, parseResult);
+
+    if (parseResult.exitCode == 0) {
+
+      // @ts-ignore
+      parseResult.program.byteCodes = this.pass2(tokenStream, parseResult);
+    }
+
 
     return parseResult;
   }
@@ -96,9 +105,11 @@ export default class Parser {
     return {
       exitCode: 0,
       status: "Parsing complete",
-      symbolTable: this._symbolTable,
-      jumpTable: this._jumpTable,
-      byteCodes: this._byteCodes,
+      program: {
+        jumpTable: this._jumpTable,
+        symbolTable: this._symbolTable,
+        byteCodes: this._byteCodes
+      },
       cs: cs,
       ds: ds
     }
@@ -192,13 +203,33 @@ export default class Parser {
       // @ts-ignore
     } else if (this._symbolTable.has(token)) {
 
+
       if (position == 2) {
-        // @ts-ignore
-        byteCode.op2 = keywords.get(token).opCode;
-        byteCode.op2Operand = Operand.CONSTANT;
+
+        if (!isNaN(Number(this._symbolTable.get(token)))) {
+          // @ts-ignore
+          byteCode.op2 = Number(this._symbolTable.get(token));
+          byteCode.op2Operand = Operand.NUMBER;
+        } else {
+          // @ts-ignore
+          byteCode.op2 = this._symbolTable.get(token);
+          byteCode.op2Operand = Operand.CONSTANT;
+        }
+
+
       } else {
-        // @ts-ignore
-        byteCode.op3 = keywords.get(token).opCode;
+
+
+        if (!isNaN(Number(this._symbolTable.get(token)))) {
+          // @ts-ignore
+          byteCode.op3 = Number(this._symbolTable.get(token));
+          byteCode.op2Operand = Operand.NUMBER;
+        } else {
+          // @ts-ignore
+          byteCode.op3 = this._symbolTable.get(token);
+          byteCode.op2Operand = Operand.CONSTANT;
+        }
+
         byteCode.op3Operand = Operand.CONSTANT;
       }
     } else if (!isNaN(Number(token))) {
@@ -215,7 +246,22 @@ export default class Parser {
       }
 
     } else {
-      console.error(`Compilation error: unable to determine opCode for '${token}'`);
+
+      if (token[0] == "\"" && token[token.length - 1] == "\"") {
+        if (position == 2) {
+          // @ts-ignore
+          byteCode.op2 = token;
+          byteCode.op2Operand = Operand.CONSTANT;
+        } else {
+          // @ts-ignore
+          byteCode.op3 = token;
+          byteCode.op3Operand = Operand.CONSTANT;
+        }
+      } else {
+        console.error(`Compilation error: unable to determine opCode for '${token}'`);
+      }
+
+
     }
 
 
@@ -357,10 +403,14 @@ export default class Parser {
         }
 
         if (isNaN(Number(op3))) {
-          return {
-            exitCode: 1,
-            status: `Unrecognized symbol in position 3 '${op3}'`
+
+          if (op3[0] != "\"" && op3[op3.length -1] != "\"") {
+            return {
+              exitCode: 1,
+              status: `Unrecognized symbol in position 3 '${op3}'`
+            }
           }
+
         }
       }
     }

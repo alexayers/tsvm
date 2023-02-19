@@ -1,13 +1,12 @@
-import Parser, {ParseResult} from "./parser";
+import Parser, {ParseResult, Program} from "./parser";
 import Lexer from "./lexer";
 import {Token} from "./constants";
 
 export interface CompilerResult {
   status: string
   exitCode: number
-  byteCodes?: Array<number>
 
-  parseResults: ParseResult
+  program: Program | undefined
 }
 
 
@@ -32,7 +31,7 @@ export class Compiler {
     return {
       exitCode: parseResult.exitCode,
       status: parseResult.status,
-      parseResults: parseResult
+      program: parseResult.program
     };
   }
 
