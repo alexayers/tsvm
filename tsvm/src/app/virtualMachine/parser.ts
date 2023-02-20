@@ -264,11 +264,11 @@ export default class Parser {
       if (token[0] == "\"" && token[token.length - 1] == "\"") {
         if (position == 2) {
           // @ts-ignore
-          byteCode.op2 = token;
+          byteCode.op2 = token.replaceAll("\"","");
           byteCode.op2Operand = Operand.CONSTANT;
         } else {
           // @ts-ignore
-          byteCode.op3 = token;
+          byteCode.op3 = token.replaceAll("\"","");
           byteCode.op3Operand = Operand.CONSTANT;
         }
       } else {

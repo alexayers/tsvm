@@ -20,11 +20,14 @@ export default class VirtualMachine {
   private _registers: Array<any>;
   private _stack: Array<any>;
 
+  private _running: boolean;
+
   private _program?: Program;
 
   constructor() {
     this._compiler = new Compiler();
 
+    this._running = true;
     this._ip = 0;
     this._sp = 0;
     this._flags = [];
@@ -45,7 +48,7 @@ export default class VirtualMachine {
 
 
   compile(code: string): void {
-    let compilerResult : CompilerResult = this._compiler.compile(code);
+    let compilerResult: CompilerResult = this._compiler.compile(code);
 
     if (compilerResult.exitCode != 0) {
       this._outputBuffer = compilerResult.status;
@@ -60,38 +63,36 @@ export default class VirtualMachine {
     if (this._program) {
       this._outputBuffer = "";
       console.log("Executing program");
-      let running : boolean = true;
 
-      let cpuTick : number = 0;
+      let cpuTick: number = 0;
 
       // @ts-ignore
       do {
 
-        let byteCode : ByteCode = this.fetch();
+        let byteCode: ByteCode = this.fetch();
 
         console.log(`Fetched ${JSON.stringify(byteCode)}`);
 
         if (byteCode.instructionSize == -1) {
-          running = false;
+          this._running = false;
           console.log("CPU: Segment fault. Exiting");
 
           // @ts-ignore
         } else if (cpuTick > (this._program.byteCodes.length * 100)) {
-          running = false;
+          this._running  = false;
           return "CPU: Infinite Loop detected. Exiting";
         } else {
           this.decode(byteCode);
         }
 
-
         cpuTick++;
-      } while (running);
+      } while (this._running );
 
     }
     return this._outputBuffer;
   }
 
-  private fetch() : ByteCode {
+  private fetch(): ByteCode {
 
     if (this._program) {
       let byteCode: ByteCode | undefined = this._program?.byteCodes?.[this._ip];
@@ -138,7 +139,8 @@ export default class VirtualMachine {
         }
 
         break;
-      case Instruction.POPA:;
+      case Instruction.POPA:
+        ;
         for (let i = 31; i >= 0; i--) {
           this._registers[i] = this._stack.pop();
         }
@@ -159,7 +161,7 @@ export default class VirtualMachine {
   private handleTwoInstructionLine(byteCode: ByteCode) {
     switch (byteCode.op1) {
       case Instruction.INC:
-          this._registers[byteCode.op2]++;
+        this._registers[byteCode.op2]++;
         break;
       case Instruction.DEC:
         this._registers[byteCode.op2]--;
@@ -177,7 +179,7 @@ export default class VirtualMachine {
 
         break;
       case Instruction.POP:
-        this._registers[byteCode.op2] =  this._stack.pop();
+        this._registers[byteCode.op2] = this._stack.pop();
         break;
       case Instruction.JMP:
 
@@ -186,34 +188,34 @@ export default class VirtualMachine {
         break;
       case Instruction.JL:
 
-        if ( this._flags[Flag.ZERO] == 0 && this._flags[Flag.CARRY] == 1) {
+        if (this._flags[Flag.ZERO] == 0 && this._flags[Flag.CARRY] == 1) {
           this._ip = byteCode.op2;
         }
 
         break;
       case Instruction.JG:
 
-        if ( this._flags[Flag.ZERO] == 0 && this._flags[Flag.CARRY] == 0) {
+        if (this._flags[Flag.ZERO] == 0 && this._flags[Flag.CARRY] == 0) {
           this._ip = byteCode.op2;
         }
 
         break;
       case Instruction.JGE:
 
-        if ( this._flags[Flag.ZERO] == 1 || this._flags[Flag.CARRY] == 0) {
+        if (this._flags[Flag.ZERO] == 1 || this._flags[Flag.CARRY] == 0) {
           this._ip = byteCode.op2;
         }
 
         break;
       case Instruction.JLE:
 
-        if ( this._flags[Flag.ZERO] == 1 || this._flags[Flag.CARRY] == 1) {
+        if (this._flags[Flag.ZERO] == 1 || this._flags[Flag.CARRY] == 1) {
           this._ip = byteCode.op2;
         }
 
         break;
       case Instruction.JNE:
-        if ( this._flags[Flag.ZERO] == 0) {
+        if (this._flags[Flag.ZERO] == 0) {
           this._ip = byteCode.op2;
         }
         break;
@@ -229,10 +231,11 @@ export default class VirtualMachine {
 
         break;
       case Instruction.INT:
-        switch ( byteCode.op2) {
+        switch (byteCode.op2) {
           case 1:
-              this.handleIO(byteCode);
+            this.handleIO(byteCode);
             break;
+
         }
         break;
     }
@@ -247,6 +250,8 @@ export default class VirtualMachine {
         if (byteCode.op3Operand == Operand.REGISTER) {
           this._registers[byteCode.op2] = this._registers[byteCode.op3];
         } else if (byteCode.op3Operand == Operand.NUMBER) {
+          this._registers[byteCode.op2] = byteCode.op3;
+        } else if (byteCode.op3Operand == Operand.CONSTANT) {
           this._registers[byteCode.op2] = byteCode.op3;
         }
 
@@ -350,6 +355,16 @@ export default class VirtualMachine {
   }
 
   private handleIO(byteCode: ByteCode) {
-    this._outputBuffer += this._registers[0] + "<br>";
+
+    switch (this._registers[31]) {
+      case 0:
+        this._outputBuffer += this._registers[0] + "<br>";
+        break;
+      case 1:
+        this._outputBuffer += ":";
+        this._running = false;
+        break;
+    }
+
   }
 }

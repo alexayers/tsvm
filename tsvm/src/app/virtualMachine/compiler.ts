@@ -10,7 +10,6 @@ export interface CompilerResult {
 }
 
 
-
 export class Compiler {
 
   private _lexer: Lexer;

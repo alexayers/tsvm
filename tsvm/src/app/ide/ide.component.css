@@ -21,7 +21,7 @@
 #ide {
 
   line-height: 21px;
-  overflow-y: hidden;
+  overflow-y: scroll;
   padding: 0;
 
   background: #282a3a;
@@ -30,6 +30,7 @@
   outline: none;
   resize: none;
   height: 350px;
+
 }
 
 .statement {
