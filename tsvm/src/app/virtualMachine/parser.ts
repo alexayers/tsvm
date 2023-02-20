@@ -60,7 +60,7 @@ export default class Parser {
 
       if (token.value == ".code") {
 
-        this._codeSegment  = i + 1;
+        this._codeSegment = i + 1;
         parseResult = this.syntaxAnalysis(tokenStream, i);
 
         if (parseResult.exitCode != 0) {
@@ -150,7 +150,6 @@ export default class Parser {
       }
 
 
-
       let instructionSize = instructionRule.lineLength;
       byteCode.instructionSize = instructionSize;
 
@@ -198,7 +197,7 @@ export default class Parser {
         byteCode.op2 = keywords.get(token).opCode;
         byteCode.op2Operand = Operand.REGISTER;
       } else {
-// @ts-ignore
+      // @ts-ignore
         byteCode.op3 = keywords.get(token).opCode;
         byteCode.op3Operand = Operand.REGISTER;
       }
@@ -263,11 +262,11 @@ export default class Parser {
       if (token[0] == "\"" && token[token.length - 1] == "\"") {
         if (position == 2) {
           // @ts-ignore
-          byteCode.op2 = token.replaceAll("\"","");
+          byteCode.op2 = token.replaceAll("\"", "");
           byteCode.op2Operand = Operand.CONSTANT;
         } else {
           // @ts-ignore
-          byteCode.op3 = token.replaceAll("\"","");
+          byteCode.op3 = token.replaceAll("\"", "");
           byteCode.op3Operand = Operand.CONSTANT;
         }
       } else {

@@ -78,7 +78,7 @@ export default class VirtualMachine {
           // @ts-ignore
         } else if (cpuTick > (this._program.byteCodes.length * 100)) {
           this._running  = false;
-          return "CPU: Infinite Loop detected. Exiting";
+          return "CPU: Segment fault. Exiting";
         } else {
           this.decode(byteCode);
         }

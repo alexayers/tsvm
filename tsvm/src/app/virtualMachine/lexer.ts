@@ -7,6 +7,14 @@ export default class Lexer {
   private _tokenStream: Array<Token> = [];
 
   tokenize(code : string)  : Array<Token> {
+     let tokenStream : Array<Token> = this.pass1(code);
+
+     return tokenStream;
+  }
+
+
+
+  pass1(code : string)  : Array<Token> {
 
     let token: string = "";
 
@@ -37,6 +45,8 @@ export default class Lexer {
           ch = code[i];
           i++;
         } while (ch != '\n');
+
+        i--;
       } else if (ch != ' ') {
         token += ch;
 
@@ -51,7 +61,6 @@ export default class Lexer {
 
     return this._tokenStream;
   }
-
 
   addToken(tokenString: string) : void {
     if (tokenString != "") {
@@ -76,4 +85,6 @@ export default class Lexer {
   isValidToken(token: string) : boolean {
     return keywords.has(token);
   }
+
+
 }
