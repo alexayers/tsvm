@@ -26,6 +26,7 @@ function assignOpCode() : number {
 }
 
 export enum Instruction {
+  NOOP,
   MOV,
   LEA,
   ADD,
@@ -102,7 +103,7 @@ export const keywords : Map<string,Token> =new Map([
 
 
 for (let i =0; i < 10; i++) {
-  keywords.set(`r${i}`, {operand: Operand.REGISTER,value: `r${i}`, opCode:assignOpCode()})
+  keywords.set(`r${i}`, {operand: Operand.REGISTER,value: `r${i}`, opCode:i})
 }
 
 

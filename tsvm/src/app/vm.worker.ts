@@ -9,6 +9,6 @@ addEventListener('message', ({data}) => {
 
   virtualMachine.compile(data);
 
-  const response = virtualMachine.execute();
-  postMessage(response);
+  let outputBuffer : string = virtualMachine.execute();
+  postMessage(outputBuffer);
 });
