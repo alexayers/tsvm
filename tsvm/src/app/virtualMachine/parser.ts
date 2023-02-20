@@ -365,6 +365,8 @@ export default class Parser {
     // @ts-ignore
     let instructionRule: InstructionRule = instructionRules.get(op1);
 
+    console.log(op1);
+    console.log(instructionRule);
 
     //@ts-ignore
     if (instructionRule.position1 == PositionRule.REGISTER) {

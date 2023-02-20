@@ -76,7 +76,7 @@ export const keywords : Map<string,Token> =new Map([
   ["xor",{operand: Operand.INSTRUCTION,value: "xor", opCode:assignOpCode()}],
   ["neg",{operand: Operand.INSTRUCTION,value: "neg", opCode:assignOpCode()}],
 
-  ["cmp",{operand: Operand.INSTRUCTION,value: "jmp", opCode:assignOpCode()}],
+  ["cmp",{operand: Operand.INSTRUCTION,value: "cmp", opCode:assignOpCode()}],
   ["jmp",{operand: Operand.INSTRUCTION,value: "jmp", opCode:assignOpCode()}],
   ["je",{operand: Operand.INSTRUCTION,value: "je", opCode:assignOpCode()}],
   ["jne",{operand: Operand.INSTRUCTION,value: "jne", opCode:assignOpCode()}],
@@ -137,7 +137,7 @@ export const instructionRules: Map<string, InstructionRule> = new Map<string, In
   ["xor", {lineLength: 3, position1: PositionRule.REGISTER, position2: PositionRule.REGISTER_OR_CONSTANT}],
   ["neg", {lineLength: 2, position1: PositionRule.REGISTER, position2: PositionRule.REGISTER_OR_CONSTANT}],
 
-  ["cmp", {lineLength: 3, position1: PositionRule.REGISTER}],
+  ["cmp", {lineLength: 3, position1: PositionRule.REGISTER,position2: PositionRule.REGISTER}],
   ["jmp", {lineLength: 2, position1: PositionRule.CONSTANT}],
   ["je", {lineLength: 2, position1: PositionRule.CONSTANT}],
   ["jne", {lineLength: 2, position1: PositionRule.CONSTANT}],
