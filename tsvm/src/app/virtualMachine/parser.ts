@@ -80,7 +80,6 @@ export default class Parser {
 
         foundDataSegment = true;
         console.log("Symbol Table created...");
-        console.log(this._symbolTable);
       }
     }
 
@@ -98,7 +97,7 @@ export default class Parser {
       }
     }
 
-    console.log("Parser pass1 complete...")
+    console.log("pass1 complete...")
 
     return {
       exitCode: 0,
@@ -186,7 +185,7 @@ export default class Parser {
       byteCodes.push(byteCode);
     }
 
-    console.log("ByteCode generation complete...");
+    console.log("pass2: ByteCode generation complete...");
     return byteCodes;
   }
 
@@ -366,9 +365,6 @@ export default class Parser {
 
     // @ts-ignore
     let instructionRule: InstructionRule = instructionRules.get(op1);
-
-    console.log(op1);
-    console.log(instructionRule);
 
     //@ts-ignore
     if (instructionRule.position1 == PositionRule.REGISTER) {

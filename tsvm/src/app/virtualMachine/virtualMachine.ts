@@ -71,8 +71,6 @@ export default class VirtualMachine {
 
         let byteCode: ByteCode = this.fetch();
 
-        console.log(`Fetched ${JSON.stringify(byteCode)}`);
-
         if (byteCode.instructionSize == -1) {
           this._running = false;
           console.log("CPU: Segment fault. Exiting");
@@ -243,7 +241,6 @@ export default class VirtualMachine {
 
   private handleThreeInstructionLine(byteCode: ByteCode) {
 
-    console.log(byteCode.op1)
     switch (byteCode.op1) {
       case Instruction.MOV:
 
