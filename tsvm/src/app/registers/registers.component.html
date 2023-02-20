@@ -1,0 +1,73 @@
+
+<div>
+
+
+  <h2>Instruction Set (x86)</h2>
+
+  <b>Program Segements</b>
+  <ul>
+    <li>.code: Location of code in program </li>
+    <li>.data: Location of data in program</li>
+  </ul>
+  <b>Registers</b>
+  <ul>
+    <li>r0 - r9: General Purpose Registers</li>
+    <li>ix: Interrupt Register</li>
+    <li>ip: Instruction Pointer</li>
+    <li>sp: Stack pointer register</li>
+    <li>flag: Flag register</li>
+  </ul>
+  <b>Data</b>
+  <ul>
+    <li>mov: Move data between registers (ex: mov r01 r1)</li>
+    <li>push: Push data onto stack (ex: push r0)</li>
+    <li>pop: Pop data from stack into a register (Ex: pop r0)</li>
+    <li>pusha: Push all registers (ex: pusha)</li>
+    <li>popa: Pop all registers (ex: popa)</li>
+  </ul>
+  <b>Math</b>
+  <ul>
+    <li>add: Add two registers, or register and value. (ex: add r0 r1)</li>
+    <li>sub: Subtract two registers, or register and value</li>
+    <li>div: Divide two registers, or register and value</li>
+    <li>mul: Multiply two registers, or register and value</li>
+    <li>inc: Increase register by 1</li>
+    <li>dec: Decrement register by 1</li>
+  </ul>
+  <b>Bitwise</b>
+  <ul>
+    <li>and: Logical AND two registers, or register and value</li>
+    <li>or: Logical OR two registers, or register and value</li>
+    <li>not: Logical NOT two registers, or register and value</li>
+    <li>xor: Logical XOR two registers, or register and value</li>
+    <li>neg: Negative value in register</li>
+  </ul>
+  <b>Comparison</b>
+  <ul>
+    <li>cmp: Compare two registers</li>
+  </ul>
+  <b>Control Flow</b>
+  <ul>
+    <li>jmp: Jump to label</li>
+    <li>je: Jump if last comparison equal x == y</li>
+    <li>jl: Jump if last comparison less than x < y</li>
+    <li>jg: Jump if last comparison greater than x > y</li>
+    <li>jne: Jump if last comparison not equal x != y</li>
+    <li>jle: Jump if last comparison less than equal x <= y</li>
+    <li>jge: Jump if last comparison greater than equal x >= y</li>
+  </ul>
+  <b>Subroutine</b>
+  <ul>
+    <li>&lt;label&gt;: A unique destination in memory</li>
+    <li>call: Pushes registers to stack. Jump to label</li>
+    <li>ret: Pop registers from stack. Return to instruction after to call</li>
+  </ul>
+  <b>Interrupts</b>
+  <ul>
+    <li>int 1: The screen</li>
+    <!--
+    <li>int 2: The keyboard</li>
+    <li>int 3: The hard drive</li>
+    -->
+  </ul>
+</div>
