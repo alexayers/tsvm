@@ -8,9 +8,18 @@
     <div id="codeSegment">
 
       .code<br>
+      <br>
+      ; Simple program to test functionality of the VM<br>
+      <br>
       mov r0 3<br>
       mov r1 4<br>
+      cmp r0 r1<br>
+      jmp skip<br>
       add r0 r1<br>
+      <br>
+      skip:<br>
+      mul r0 r1<br>
+
       mov ix 0<br>
       int 1<br>
 

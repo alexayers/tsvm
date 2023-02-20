@@ -145,10 +145,12 @@ export default class Parser {
       // @ts-ignore
       let instructionRule: InstructionRule = instructionRules.get(op1);
 
-      // Labels are skipped
+      // Labels are skipped and comments are skipped
       if (instructionRule == undefined) {
         continue;
       }
+
+
 
       let instructionSize = instructionRule.lineLength;
       byteCode.instructionSize = instructionSize;
