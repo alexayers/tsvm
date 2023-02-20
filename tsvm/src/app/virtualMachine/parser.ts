@@ -54,15 +54,13 @@ export default class Parser {
     let foundCodeSegment: boolean = false;
     let foundDataSegment: boolean = false;
     let parseResult: ParseResult;
-    let cs: number = 0;
-    let ds: number = 0;
 
     for (let i = 0; i < tokenStream.length; i++) {
       let token: Token = tokenStream[i];
 
       if (token.value == ".code") {
 
-        cs = i + 1;
+        this._codeSegment  = i + 1;
         parseResult = this.syntaxAnalysis(tokenStream, i);
 
         if (parseResult.exitCode != 0) {
@@ -73,7 +71,7 @@ export default class Parser {
         foundCodeSegment = true;
       } else if (token.value == ".data") {
 
-        ds = i + 1;
+        this._dataSegment = i + 1;
         parseResult = this.buildSymbolTable(tokenStream, i);
 
         if (parseResult.exitCode != 0) {
@@ -110,8 +108,8 @@ export default class Parser {
         symbolTable: this._symbolTable,
         byteCodes: this._byteCodes
       },
-      cs: cs,
-      ds: ds
+      cs: this._codeSegment,
+      ds: this._dataSegment
     }
   }
 
@@ -120,7 +118,7 @@ export default class Parser {
 
     // @ts-ignore
     let startingIdx: number = parseResult.cs;
-    let endingIdx: number = 0;
+    let endingIdx: number;
 
     // @ts-ignore
     if (parseResult.ds > parseResult.cs) {
@@ -147,7 +145,11 @@ export default class Parser {
       // @ts-ignore
       let instructionRule: InstructionRule = instructionRules.get(op1);
 
-      console.log(instructionRule);
+      // Labels are skipped
+      if (instructionRule == undefined) {
+        continue;
+      }
+
       let instructionSize = instructionRule.lineLength;
       byteCode.instructionSize = instructionSize;
 
@@ -196,7 +198,7 @@ export default class Parser {
         byteCode.op2Operand = Operand.REGISTER;
       } else {
 // @ts-ignore
-        byteCode.op3= keywords.get(token).opCode;
+        byteCode.op3 = keywords.get(token).opCode;
         byteCode.op3Operand = Operand.REGISTER;
       }
 
@@ -232,6 +234,16 @@ export default class Parser {
 
         byteCode.op3Operand = Operand.CONSTANT;
       }
+    } else if (this._jumpTable.has(token)) {
+
+      if (position == 2) {
+
+        // @ts-ignore
+        byteCode.op2 = this._jumpTable.get(token) - this._codeSegment; // Adjust to the real starting position
+        byteCode.op2Operand = Operand.CONSTANT;
+
+      }
+
     } else if (!isNaN(Number(token))) {
 
 
@@ -404,7 +416,7 @@ export default class Parser {
 
         if (isNaN(Number(op3))) {
 
-          if (op3[0] != "\"" && op3[op3.length -1] != "\"") {
+          if (op3[0] != "\"" && op3[op3.length - 1] != "\"") {
             return {
               exitCode: 1,
               status: `Unrecognized symbol in position 3 '${op3}'`

@@ -62,6 +62,8 @@ export default class VirtualMachine {
       console.log("Executing program");
       let running : boolean = true;
 
+      let cpuTick : number = 0;
+
       // @ts-ignore
       do {
 
@@ -72,12 +74,17 @@ export default class VirtualMachine {
         if (byteCode.instructionSize == -1) {
           running = false;
           console.log("CPU: Segment fault. Exiting");
+
+          // @ts-ignore
+        } else if (cpuTick > (this._program.byteCodes.length * 100)) {
+          running = false;
+          return "CPU: Infinite Loop detected. Exiting";
         } else {
           this.decode(byteCode);
         }
 
-        console.debug(`Registers: ${this._registers}`);
 
+        cpuTick++;
       } while (running);
 
     }
@@ -125,10 +132,26 @@ export default class VirtualMachine {
     switch (byteCode.op1) {
 
       case Instruction.PUSHA:
+
+        for (let i = 0; i < 32; i++) {
+          this._stack.push(this._registers[i]);
+        }
+
         break;
-      case Instruction.POPA:
-        break;
+      case Instruction.POPA:;
+        for (let i = 31; i >= 0; i--) {
+          this._registers[i] = this._stack.pop();
+        }
+
+        break
       case Instruction.RET:
+
+        for (let i = 31; i >= 0; i--) {
+          this._registers[i] = this._stack.pop();
+        }
+
+        this._ip = this._stack.pop();
+
         break;
     }
   }
@@ -157,18 +180,53 @@ export default class VirtualMachine {
         this._registers[byteCode.op2] =  this._stack.pop();
         break;
       case Instruction.JMP:
+
+        this._ip = byteCode.op2;
+
         break;
       case Instruction.JL:
+
+        if ( this._flags[Flag.ZERO] == 0 && this._flags[Flag.CARRY] == 1) {
+          this._ip = byteCode.op2;
+        }
+
         break;
       case Instruction.JG:
+
+        if ( this._flags[Flag.ZERO] == 0 && this._flags[Flag.CARRY] == 0) {
+          this._ip = byteCode.op2;
+        }
+
         break;
       case Instruction.JGE:
+
+        if ( this._flags[Flag.ZERO] == 1 || this._flags[Flag.CARRY] == 0) {
+          this._ip = byteCode.op2;
+        }
+
         break;
       case Instruction.JLE:
+
+        if ( this._flags[Flag.ZERO] == 1 || this._flags[Flag.CARRY] == 1) {
+          this._ip = byteCode.op2;
+        }
+
         break;
       case Instruction.JNE:
+        if ( this._flags[Flag.ZERO] == 0) {
+          this._ip = byteCode.op2;
+        }
         break;
       case Instruction.CALL:
+
+        this._stack.push(this._ip);
+
+        for (let i = 0; i < 32; i++) {
+          this._stack.push(this._registers[i]);
+        }
+
+        this._ip = byteCode.op2;
+
         break;
       case Instruction.INT:
         switch ( byteCode.op2) {
@@ -292,8 +350,6 @@ export default class VirtualMachine {
   }
 
   private handleIO(byteCode: ByteCode) {
-    let io : number = this._registers[31];
-
     this._outputBuffer += this._registers[0] + "<br>";
   }
 }
