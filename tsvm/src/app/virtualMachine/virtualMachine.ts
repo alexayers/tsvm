@@ -73,12 +73,12 @@ export default class VirtualMachine {
 
         if (byteCode.instructionSize == -1) {
           this._running = false;
-          console.log("CPU: Segment fault. Exiting");
+          console.log("CPU: Segment fault. Invalid instruction size. Exiting");
 
           // @ts-ignore
         } else if (cpuTick > (this._program.byteCodes.length * 100)) {
           this._running  = false;
-          return "CPU: Segment fault. Exiting";
+          return  "CPU: Segment fault. Exiting";
         } else {
           this.decode(byteCode);
         }

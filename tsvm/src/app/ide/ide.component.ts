@@ -49,6 +49,7 @@ export class IdeComponent implements OnInit, OnDestroy {
 
   processCode(innerText: string) {
 
+
     let keywords = ["mov"];
     let newHTML = "";
     // Loop through words
